@@ -14,7 +14,12 @@ import { ArrowLeft } from "lucide-react-native";
 import { supabase } from "../../lib/supabase";
 
 export default function VerifyCodeScreen({ navigation, route }: any) {
-  const { email } = route.params;
+  // Support both email and phone verification
+  const email = route.params?.email;
+  const phone = route.params?.phone;
+  const isPhoneVerification = !!phone;
+  const identifier = email || phone;
+
   const [code, setCode] = useState(["", "", "", "", "", ""]); // 6 digits
   const [timer, setTimer] = useState(30);
   const inputs = useRef<TextInput[]>([]);
@@ -57,24 +62,35 @@ export default function VerifyCodeScreen({ navigation, route }: any) {
       return;
     }
 
-    const { data, error } = await supabase.auth.verifyOtp({
-      email,
-      token: otp,
-      type: "email",
-    });
+    const { data, error } = await supabase.auth.verifyOtp(
+      isPhoneVerification
+        ? {
+            phone,
+            token: otp,
+            type: "sms",
+          }
+        : {
+            email,
+            token: otp,
+            type: "email",
+          }
+    );
 
     if (error) {
       Alert.alert("Verification Failed", error.message);
     } else {
-      // AuthContext usually handles session state change, or navigate to Home
-      // navigation.reset(...) handled by App.tsx session usage
+      // Verification successful!
+      // App.tsx will automatically show ProfileSetup screen since profile is not complete
     }
   };
 
   const handleResend = async () => {
     if (timer > 0) return;
 
-    const { error } = await supabase.auth.signInWithOtp({ email });
+    const { error } = isPhoneVerification
+      ? await supabase.auth.signInWithOtp({ phone })
+      : await supabase.auth.signInWithOtp({ email });
+
     if (error) {
       Alert.alert("Error", error.message);
     } else {
@@ -101,10 +117,11 @@ export default function VerifyCodeScreen({ navigation, route }: any) {
         <View style={styles.content}>
           <Text style={styles.title}>Verify Account</Text>
           <Text style={styles.description}>
-            We've sent a 6-digit code to {email} via text. Please enter it to
+            We've sent a 6-digit code to {identifier}{" "}
+            {isPhoneVerification ? "via SMS" : "via email"}. Please enter it to
             verify your account.{" "}
             <Text style={styles.link} onPress={() => navigation.goBack()}>
-              Change Email
+              Change {isPhoneVerification ? "Phone" : "Email"}
             </Text>
           </Text>
 

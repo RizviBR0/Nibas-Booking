@@ -8,7 +8,6 @@ import * as SplashScreen from "expo-splash-screen";
 // Keep the splash screen visible while we fetch resources
 SplashScreen.preventAutoHideAsync();
 
-import Logo from "../assets/logo.svg";
 import NibasSplash from "../assets/nibas_splash.svg";
 
 export default function CustomSplashScreen({
@@ -27,7 +26,7 @@ export default function CustomSplashScreen({
       const timer = setTimeout(async () => {
         await SplashScreen.hideAsync();
         onFinish();
-      }, 4000); // Show splash for 4 seconds
+      }, 1000); // Show splash for 5 seconds
 
       return () => clearTimeout(timer);
     }
@@ -41,7 +40,10 @@ export default function CustomSplashScreen({
     <View style={styles.container}>
       <View style={styles.content}>
         <View style={styles.brandingContainer}>
-          <Logo width={60} height={60} style={styles.logo} />
+          <Image
+            source={require("../assets/icon.png")}
+            style={{ width: 60, height: 60, ...styles.logo }}
+          />
           <NibasSplash width={200} height={80} style={styles.nibasText} />
         </View>
         <Text style={styles.tagline}>Trusted Stays, Rooted in Home.</Text>

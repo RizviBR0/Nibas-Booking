@@ -8,40 +8,39 @@ import {
   SafeAreaView,
   KeyboardAvoidingView,
   Platform,
-  Modal,
-  FlatList,
-  TouchableWithoutFeedback,
+  Alert,
 } from "react-native";
-import { ChevronDown, ArrowLeft, X, Search } from "lucide-react-native";
-import { countryList, Country } from "../../lib/countries";
+import { ArrowLeft, X } from "lucide-react-native";
+import { supabase } from "../../lib/supabase";
 
 export default function PhoneAuthScreen({ navigation }: any) {
   const [phoneNumber, setPhoneNumber] = useState("");
-  const [selectedCountry, setSelectedCountry] = useState<Country>(
-    countryList.find((c) => c.code === "BD") || countryList[0]
-  );
-  const [modalVisible, setModalVisible] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const filteredCountries = countryList.filter(
-    (country) =>
-      country.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      country.dial_code.includes(searchQuery)
-  );
+  const handleContinue = async () => {
+    if (!phoneNumber || phoneNumber.length < 6) {
+      Alert.alert("Error", "Please enter a valid phone number");
+      return;
+    }
 
-  const renderCountryItem = ({ item }: { item: Country }) => (
-    <TouchableOpacity
-      style={styles.countryItem}
-      onPress={() => {
-        setSelectedCountry(item);
-        setModalVisible(false);
-      }}
-    >
-      <Text style={styles.countryItemFlag}>{item.flag}</Text>
-      <Text style={styles.countryItemName}>{item.name}</Text>
-      <Text style={styles.countryItemCode}>{item.dial_code}</Text>
-    </TouchableOpacity>
-  );
+    const fullPhoneNumber = `+880${phoneNumber.replace(/\s/g, "")}`;
+
+    setLoading(true);
+    const { error } = await supabase.auth.signInWithOtp({
+      phone: fullPhoneNumber,
+      options: {
+        shouldCreateUser: true,
+      },
+    });
+
+    setLoading(false);
+
+    if (error) {
+      Alert.alert("Error", error.message);
+    } else {
+      navigation.navigate("VerifyCode", { phone: fullPhoneNumber });
+    }
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -68,22 +67,12 @@ export default function PhoneAuthScreen({ navigation }: any) {
           <View style={styles.inputContainer}>
             <Text style={styles.label}>Phone Number</Text>
             <View style={styles.inputRow}>
-              <TouchableOpacity
-                style={styles.countryPicker}
-                onPress={() => setModalVisible(true)}
-              >
+              <View style={styles.countryPicker}>
                 <View style={styles.flagPlaceholder}>
-                  <Text style={{ fontSize: 18 }}>{selectedCountry.flag}</Text>
+                  <Text style={{ fontSize: 18 }}>🇧🇩</Text>
                 </View>
-                <Text style={styles.countryCode}>
-                  {selectedCountry.dial_code}
-                </Text>
-                <ChevronDown
-                  size={16}
-                  color="#0e121b"
-                  style={{ marginLeft: 4 }}
-                />
-              </TouchableOpacity>
+                <Text style={styles.countryCode}>+880</Text>
+              </View>
 
               <TextInput
                 style={styles.phoneInput}
@@ -100,48 +89,15 @@ export default function PhoneAuthScreen({ navigation }: any) {
         <View style={styles.footer}>
           <TouchableOpacity
             style={styles.continueButton}
-            onPress={() => {
-              /* Handle Continue */
-            }}
+            onPress={handleContinue}
+            disabled={loading}
           >
-            <Text style={styles.continueButtonText}>Continue</Text>
+            <Text style={styles.continueButtonText}>
+              {loading ? "Sending..." : "Continue"}
+            </Text>
           </TouchableOpacity>
         </View>
       </KeyboardAvoidingView>
-
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={modalVisible}
-        onRequestClose={() => setModalVisible(false)}
-      >
-        <SafeAreaView style={styles.modalContainer}>
-          <View style={styles.modalHeader}>
-            <TouchableOpacity onPress={() => setModalVisible(false)}>
-              <ArrowLeft size={24} color="#0e121b" />
-            </TouchableOpacity>
-            <Text style={styles.modalTitle}>Select Country</Text>
-            <View style={{ width: 24 }} />
-          </View>
-
-          <View style={styles.searchContainer}>
-            <Search size={20} color="#667085" style={{ marginRight: 10 }} />
-            <TextInput
-              style={styles.searchInput}
-              placeholder="Search country"
-              value={searchQuery}
-              onChangeText={setSearchQuery}
-            />
-          </View>
-
-          <FlatList
-            data={filteredCountries}
-            renderItem={renderCountryItem}
-            keyExtractor={(item) => item.code}
-            style={styles.list}
-          />
-        </SafeAreaView>
-      </Modal>
     </SafeAreaView>
   );
 }
@@ -200,8 +156,9 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     paddingHorizontal: 10,
     marginRight: 10,
-    minWidth: 100,
-    justifyContent: "space-between",
+    minWidth: 80, // Reduced from 100 since no arrow
+    justifyContent: "center",
+    backgroundColor: "#F9FAFB", // Slight bg to show it's read-only/static
   },
   flagPlaceholder: {
     marginRight: 5,
@@ -238,59 +195,5 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 16,
     fontWeight: "600",
-  },
-  // Modal Styles
-  modalContainer: {
-    flex: 1,
-    backgroundColor: "#fff",
-  },
-  modalHeader: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    padding: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: "#F2F4F7",
-  },
-  modalTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-  },
-  searchContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#F2F4F7",
-    margin: 16,
-    paddingHorizontal: 16,
-    height: 44,
-    borderRadius: 12,
-  },
-  searchInput: {
-    flex: 1,
-    fontSize: 16,
-  },
-  list: {
-    flex: 1,
-  },
-  countryItem: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingVertical: 14,
-    paddingHorizontal: 24,
-    borderBottomWidth: 1,
-    borderBottomColor: "#F2F4F7",
-  },
-  countryItemFlag: {
-    fontSize: 24,
-    marginRight: 16,
-  },
-  countryItemName: {
-    flex: 1,
-    fontSize: 16,
-    color: "#0e121b",
-  },
-  countryItemCode: {
-    fontSize: 16,
-    color: "#525866",
   },
 });

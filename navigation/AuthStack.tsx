@@ -5,6 +5,7 @@ import SignUpScreen from "../screens/auth/SignUpScreen";
 import PhoneAuthScreen from "../screens/auth/PhoneAuthScreen";
 import EmailAuthScreen from "../screens/auth/EmailAuthScreen";
 import VerifyCodeScreen from "../screens/auth/VerifyCodeScreen";
+import ProfileSetupScreen from "../screens/auth/ProfileSetupScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -26,6 +27,11 @@ export default function AuthStack() {
       <Stack.Screen
         name="VerifyCode"
         component={VerifyCodeScreen}
+        options={{ presentation: "card" }}
+      />
+      <Stack.Screen
+        name="ProfileSetup"
+        component={ProfileSetupScreen}
         options={{ presentation: "card" }}
       />
     </Stack.Navigator>
