@@ -30,7 +30,10 @@ import {
 
 const { width } = Dimensions.get("window");
 
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+
 export default function ListingDetailsScreen({ navigation, route }: any) {
+  const insets = useSafeAreaInsets();
   // 1. Get the passed listing data
   const { listing } = route.params || {};
 
@@ -98,15 +101,35 @@ export default function ListingDetailsScreen({ navigation, route }: any) {
   // listing provided: { id, title, price (string "X BDT..."), image }
   // we want to use listing.title, listing.image, and extract price.
 
-  const displayPrice = listing?.price
-    ? listing.price.split(" ")[0] // "200 BDT..." -> "200"
-    : defaultItem.price;
+  // Handle Price (string "600 BDT" or number 6000)
+  let displayPrice = defaultItem.price;
+  if (listing?.price !== undefined) {
+    if (typeof listing.price === "number") {
+      displayPrice = listing.price.toString();
+    } else {
+      displayPrice = listing.price.toString().includes(" ")
+        ? listing.price.toString().split(" ")[0]
+        : listing.price.toString();
+    }
+  }
+
+  // Handle Image (single 'image' or 'images' array)
+  let displayImage = defaultItem.image;
+  if (
+    listing?.images &&
+    Array.isArray(listing.images) &&
+    listing.images.length > 0
+  ) {
+    displayImage = listing.images[0];
+  } else if (listing?.image) {
+    displayImage = listing.image;
+  }
 
   const item = {
     ...defaultItem,
-    ...(listing || {}), // Overwrite with passed props
+    ...(listing || {}),
     price: displayPrice,
-    image: listing?.image || defaultItem.image,
+    image: displayImage,
     title: listing?.title || defaultItem.title,
   };
 
@@ -119,7 +142,9 @@ export default function ListingDetailsScreen({ navigation, route }: any) {
       />
 
       {/* Sticky Footer */}
-      <View style={styles.footer}>
+      <View
+        style={[styles.footer, { paddingBottom: Math.max(insets.bottom, 16) }]}
+      >
         <View>
           <View style={{ flexDirection: "row", alignItems: "baseline" }}>
             <Text style={styles.footerPrice}>{item.price} BDT</Text>
@@ -139,9 +164,9 @@ export default function ListingDetailsScreen({ navigation, route }: any) {
         showsVerticalScrollIndicator={false}
       >
         {/* Hero Image */}
-        <View style={styles.imageContainer}>
+        <View style={[styles.imageContainer, { position: "relative" }]}>
           <Image source={{ uri: item.image }} style={styles.image} />
-          <View style={styles.headerActions}>
+          <View style={[styles.headerActions, { top: insets.top + 10 }]}>
             <TouchableOpacity
               style={styles.circleButton}
               onPress={() => navigation.goBack()}

@@ -5,12 +5,12 @@ import {
   StyleSheet,
   TextInput,
   TouchableOpacity,
-  SafeAreaView,
   KeyboardAvoidingView,
   Platform,
   Alert,
 } from "react-native";
 import { ArrowLeft } from "lucide-react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { supabase } from "../../lib/supabase";
 import { useAuth } from "../../context/AuthContext";
 

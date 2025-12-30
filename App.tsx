@@ -45,10 +45,14 @@ function Root() {
   return <NavigationContainer>{getNavigationContent()}</NavigationContainer>;
 }
 
+import { SafeAreaProvider } from "react-native-safe-area-context";
+
 export default function App() {
   return (
-    <AuthProvider>
-      <Root />
-    </AuthProvider>
+    <SafeAreaProvider>
+      <AuthProvider>
+        <Root />
+      </AuthProvider>
+    </SafeAreaProvider>
   );
 }

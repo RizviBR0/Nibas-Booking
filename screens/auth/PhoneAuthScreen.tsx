@@ -5,12 +5,12 @@ import {
   StyleSheet,
   TextInput,
   TouchableOpacity,
-  SafeAreaView,
   KeyboardAvoidingView,
   Platform,
   Alert,
 } from "react-native";
 import { ArrowLeft, X } from "lucide-react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { supabase } from "../../lib/supabase";
 
 export default function PhoneAuthScreen({ navigation }: any) {

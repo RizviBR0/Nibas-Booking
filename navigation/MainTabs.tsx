@@ -1,6 +1,8 @@
 import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { View, Image } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+
 import ExploreScreen from "../screens/tabs/ExploreScreen";
 import WishlistScreen from "../screens/tabs/WishlistScreen";
 import TripsScreen from "../screens/tabs/TripsScreen";
@@ -17,15 +19,17 @@ const ProfileIconPng = require("../assets/icons/profile_icon.png");
 const Tab = createBottomTabNavigator();
 
 export default function MainTabs() {
+  const insets = useSafeAreaInsets();
+
   return (
     <Tab.Navigator
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: "#2B8761", // Greenish color from design (Explore text color looks green)
-        tabBarInactiveTintColor: "#9CA3AF", // Gray
+        tabBarActiveTintColor: "#37C390",
+        tabBarInactiveTintColor: "#9CA3AF",
         tabBarStyle: {
-          height: 80, // Taller tab bar
-          paddingBottom: 20,
+          height: 60 + (insets.bottom > 0 ? insets.bottom : 20),
+          paddingBottom: insets.bottom > 0 ? insets.bottom : 20,
           paddingTop: 10,
         },
         tabBarLabelStyle: {

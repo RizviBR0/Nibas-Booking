@@ -9,10 +9,10 @@ import {
   Image,
   Dimensions,
   FlatList,
-  SafeAreaView,
   StatusBar,
   Platform,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { ChevronRight, Heart } from "lucide-react-native";
 
 // Import SVG Icons
@@ -118,14 +118,21 @@ export default function ExploreScreen({ navigation }: any) {
       >
         {/* Search Header */}
         <View style={styles.header}>
-          <View style={styles.searchBar}>
+          <TouchableOpacity
+            style={styles.searchBar}
+            activeOpacity={0.9}
+            onPress={() => navigation.navigate("SearchModal")}
+          >
             <SearchIcon width={20} height={20} color="#9CA3AF" />
-            <TextInput
-              placeholder="Search destinations"
-              placeholderTextColor="#9CA3AF"
-              style={styles.searchInput}
-            />
-          </View>
+            <Text
+              style={[
+                styles.searchInput,
+                { color: "#9CA3AF", paddingVertical: 12 },
+              ]}
+            >
+              Search destinations
+            </Text>
+          </TouchableOpacity>
         </View>
 
         {/* Categories */}
