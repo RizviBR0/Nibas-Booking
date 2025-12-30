@@ -1,11 +1,18 @@
 import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { Search, Heart, Map, MessageSquare, User } from "lucide-react-native";
+import { View, Image } from "react-native";
 import ExploreScreen from "../screens/tabs/ExploreScreen";
 import WishlistScreen from "../screens/tabs/WishlistScreen";
 import TripsScreen from "../screens/tabs/TripsScreen";
 import MessagesScreen from "../screens/tabs/MessagesScreen";
 import ProfileScreen from "../screens/tabs/ProfileScreen";
+
+// Import SVG Icons
+import ExploreIcon from "../assets/icons/explore_icon.svg";
+import WishlistIcon from "../assets/icons/wishlist_icon.svg";
+import TripsIcon from "../assets/icons/trips_icon.svg";
+import ChatIcon from "../assets/icons/chat_icon.svg";
+const ProfileIconPng = require("../assets/icons/profile_icon.png");
 
 const Tab = createBottomTabNavigator();
 
@@ -14,15 +21,26 @@ export default function MainTabs() {
     <Tab.Navigator
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: "#FF385C",
-        tabBarInactiveTintColor: "gray",
+        tabBarActiveTintColor: "#2B8761", // Greenish color from design (Explore text color looks green)
+        tabBarInactiveTintColor: "#9CA3AF", // Gray
+        tabBarStyle: {
+          height: 80, // Taller tab bar
+          paddingBottom: 20,
+          paddingTop: 10,
+        },
+        tabBarLabelStyle: {
+          fontSize: 12,
+          fontWeight: "500",
+        },
       }}
     >
       <Tab.Screen
         name="Explore"
         component={ExploreScreen}
         options={{
-          tabBarIcon: ({ color, size }) => <Search color={color} size={size} />,
+          tabBarIcon: ({ color, focused }) => (
+            <ExploreIcon width={24} height={24} color={color} />
+          ),
           tabBarLabel: "Explore",
         }}
       />
@@ -30,7 +48,9 @@ export default function MainTabs() {
         name="Wishlist"
         component={WishlistScreen}
         options={{
-          tabBarIcon: ({ color, size }) => <Heart color={color} size={size} />,
+          tabBarIcon: ({ color, focused }) => (
+            <WishlistIcon width={24} height={24} color={color} />
+          ),
           tabBarLabel: "Wishlist",
         }}
       />
@@ -38,7 +58,9 @@ export default function MainTabs() {
         name="Trips"
         component={TripsScreen}
         options={{
-          tabBarIcon: ({ color, size }) => <Map color={color} size={size} />,
+          tabBarIcon: ({ color, focused }) => (
+            <TripsIcon width={24} height={24} color={color} />
+          ),
           tabBarLabel: "Trips",
         }}
       />
@@ -46,18 +68,23 @@ export default function MainTabs() {
         name="Messages"
         component={MessagesScreen}
         options={{
-          tabBarIcon: ({ color, size }) => (
-            <MessageSquare color={color} size={size} />
+          tabBarIcon: ({ color, focused }) => (
+            <ChatIcon width={24} height={24} color={color} />
           ),
-          tabBarLabel: "Messages",
+          tabBarLabel: "Chat",
         }}
       />
       <Tab.Screen
         name="Profile"
         component={ProfileScreen}
         options={{
-          tabBarIcon: ({ color, size }) => <User color={color} size={size} />,
-          tabBarLabel: "Profile",
+          tabBarIcon: ({ focused }) => (
+            <Image
+              source={ProfileIconPng}
+              style={{ width: 24, height: 24, borderRadius: 12 }}
+            />
+          ),
+          tabBarLabel: "Me",
         }}
       />
     </Tab.Navigator>

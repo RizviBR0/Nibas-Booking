@@ -15,10 +15,24 @@ import { supabase } from "../../lib/supabase";
 import { useAuth } from "../../context/AuthContext";
 
 export default function ProfileSetupScreen({ navigation }: any) {
-  const { refreshUser } = useAuth();
+  const { refreshUser, signOut } = useAuth();
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [loading, setLoading] = useState(false);
+
+  const handleBack = async () => {
+    if (navigation.canGoBack()) {
+      navigation.goBack();
+    } else {
+      // If we can't go back, it means we are in the ProfileSetupStack (forced flow)
+      // So "Back" implies cancelling the setup process, which requires signing out
+      try {
+        await signOut();
+      } catch (error) {
+        console.error("Error signing out:", error);
+      }
+    }
+  };
 
   const handleContinue = async () => {
     if (!firstName.trim()) {
@@ -89,10 +103,7 @@ export default function ProfileSetupScreen({ navigation }: any) {
         style={styles.keyboardAvoidingView}
       >
         <View style={styles.header}>
-          <TouchableOpacity
-            onPress={() => navigation.goBack()}
-            style={styles.backButton}
-          >
+          <TouchableOpacity onPress={handleBack} style={styles.backButton}>
             <ArrowLeft size={24} color="#0e121b" />
           </TouchableOpacity>
         </View>

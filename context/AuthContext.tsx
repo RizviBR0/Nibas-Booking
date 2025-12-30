@@ -30,9 +30,16 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const checkProfileComplete = (user: User | null) => {
     if (!user) return false;
-    // Check if user has first_name in metadata
-    const firstName = user.user_metadata?.first_name;
-    return !!firstName && firstName.trim() !== "";
+
+    const metadata = user.user_metadata || {};
+    const hasFirstName = !!(metadata.first_name && metadata.first_name.trim());
+    const hasFullName = !!(metadata.full_name && metadata.full_name.trim());
+
+    // Profile is considered complete if user has a name set
+    // This logic ensures:
+    // 1. New users (no name) -> false -> Show ProfileSetup
+    // 2. Existing users (have name) -> true -> Show MainTabs
+    return hasFirstName || hasFullName;
   };
 
   const refreshUser = async () => {

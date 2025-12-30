@@ -3,7 +3,7 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import AuthStack from "./navigation/AuthStack";
-import MainTabs from "./navigation/MainTabs";
+import MainStack from "./navigation/MainStack";
 import CustomSplashScreen from "./screens/SplashScreen";
 import ProfileSetupScreen from "./screens/auth/ProfileSetupScreen";
 import { View, ActivityIndicator } from "react-native";
@@ -39,7 +39,7 @@ function Root() {
     }
 
     // Fully authenticated with complete profile
-    return <MainTabs />;
+    return <MainStack />;
   };
 
   return <NavigationContainer>{getNavigationContent()}</NavigationContainer>;
